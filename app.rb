@@ -4,7 +4,7 @@ require 'dotenv/load'
 require 'sinatra'
 require 'ldclient-rb'
 
-LD_CLIENT = LaunchDarkly::LDClient.new(ENV['LD_API_KEY'])
+$ld_client = LaunchDarkly::LDClient.new(ENV['LD_API_KEY'])
 
 def new_products
   if experiment_with_user?("new-products-flag", "user@test.com")  
@@ -15,11 +15,11 @@ def new_products
 end
 
 def experiment_with_user?(flag, key)
-  LD_CLIENT.variation(flag, {key: key}, false)
+  $ld_client.variation(flag, {key: key}, false)
 end
 
 get '/products' do
   "We have great an impressive catalog of existing products. #{new_products}"
 end
 
-at_exit { LD_CLIENT.close }
+at_exit { $ld_client.close }
